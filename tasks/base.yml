@@ -9,18 +9,3 @@
     install_recommends: no
     update_cache: yes
   notify: apt changed
-
-- name: ensure config directory is created
-  file:
-    path: "{{ ansible_env.HOME }}/config/htop"
-    state: directory
-    owner: "{{ ansible_env.USER }}"
-    group: "{{ ansible_env.USER }}"
-
-- name: ensure htoprc is setup
-  template:
-    src: htoprc.j2
-    dest: "{{ ansible_env.HOME }}/config/htop/htoprc"
-    owner: "{{ ansible_env.USER }}"
-    group: "{{ ansible_env.USER }}"
-    mode: 0644
