@@ -1,0 +1,29 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- name: apt clean
+  command: apt clean
+  listen: apt changed
+
+- name: apt autoremove
+  command: apt autoremove --yes --purge
+  listen: apt changed
+
+- name: restart timesyncd
+  systemd:
+    daemon_reload: yes
+    name: systemd-timesyncd
+    state: restarted
+    enabled: yes
+
+- name: restart fail2ban
+  systemd:
+    daemon_reload: yes
+    name: fail2ban
+    state: restarted
+    enabled: yes
+
+- name: restart ufw
+  ufw:
+    state: reloaded

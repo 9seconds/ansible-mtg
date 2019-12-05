@@ -1,0 +1,26 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- name: ensure fail2ban is installed
+  apt:
+    name: fail2ban
+    state: present
+    install_recommends: no
+    update_cache: yes
+  notify: apt changed
+
+- name: ensure default configuration file is removed
+  file:
+    path: /etc/fail2ban/jail.d/defaults-debian.conf
+    state: absent
+  notify: restart fail2ban
+
+- name: ensure fail2ban is configured
+  template:
+    src: fail2ban.jail.local.j2
+    dest: /etc/fail2ban/jail.d/zzz-own-config.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart fail2ban

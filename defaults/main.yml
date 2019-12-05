@@ -1,0 +1,32 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+# set to true if this VM is created only to run mtg
+exclusive: true
+
+# timezone setting for timedatectl
+timezone: Etc/UTC
+
+# a list of ntp servers to use
+ntp_servers:
+  - 0.pool.ntp.org
+  - 1.pool.ntp.org
+  - 2.pool.ntp.org
+  - 3.pool.ntp.org
+
+fail2ban_bantime: 10m
+fail2ban_findtime: 10m
+fail2ban_maxretry: 5
+
+iptables_connlimit_above: 80
+iptables_persec_limit: 60
+iptables_persec_burst: 20
+
+# proxy settings
+proxy_port: 443
+proxy_bind: "0.0.0.0:{{ proxy_port }}"
+proxy_secret: 92b58d6f7fb2bf31df2d5c856f70f522
+proxy_adtag: ""
+proxy_binary: "/usr/local/bin/mtg"
+proxy_cli_opts: ""

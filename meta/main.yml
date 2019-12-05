@@ -1,0 +1,14 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+galaxy_info:
+  role_name: mtg
+  author: Sergey Arkhipov
+  description: A bullshit-free MTPROTO proxy for Telegram
+
+  issue_tracker_url: http://github.com/9seconds/mtg/issues
+  license: MIT
+  min_ansible_version: 2.7
+
+dependencies: []

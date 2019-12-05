@@ -1,0 +1,66 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- name: get list of releases
+  uri:
+    url: https://api.github.com/repos/9seconds/mtg/releases/latest
+    return_content: yes
+  register: release_info
+
+- name: set default architecture
+  set_fact:
+    architecture: ""
+  changed_when: false
+
+- name: check if we run on x86_64
+  set_fact:
+    architecture: amd64
+  when: '"x86_64" in ansible_architecture'
+
+- name: check if we run on arm64
+  set_fact:
+    architecture: arm64
+  when: '"aarch64" in ansible_architecture or "arm64" in ansible_architecture'
+
+- name: check if we run on arm
+  set_fact:
+    architecture: arm
+  when: '"arm" in ansible_architecture'
+
+- name: check if we run on i386/i686
+  set_fact:
+    architecture: 386
+  when: '"i386" in ansible_architecture or "i686" in ansible_architecture'
+
+- name: fail if we can't identify architecture
+  fail:
+    msg: "Unsupported architecture {{ ansible_architecture }}."
+  when: not(architecture)
+
+- name: download binary
+  get_url:
+    url: "https://github.com/9seconds/mtg/releases/download/{{ release_info.json.tag_name }}/mtg-linux-{{ architecture }}"
+    dest: "{{ proxy_binary }}"
+    mode: 0755
+
+- name: set capabilities to mtg binary
+  capabilities:
+    path: "{{ proxy_binary }}"
+    capability: cap_net_bind_service=+ep
+    state: present
+
+- name: create systemd unit
+  template:
+    src: mtg.service.j2
+    dest: /etc/systemd/system/mtg.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: run proxy
+  systemd:
+    daemon_reload: yes
+    name: mtg
+    state: restarted
+    enabled: yes

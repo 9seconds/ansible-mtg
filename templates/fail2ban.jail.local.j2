@@ -1,0 +1,21 @@
+{{ ansible_managed | comment }}
+
+[DEFAULT]
+bantime  = {{ fail2ban_bantime }}
+findtime  = {{ fail2ban_findtime }}
+maxretry = {{ fail2ban_maxretry }}
+backend = systemd
+usedns = warn
+logencoding = utf-8
+enabled = false
+
+protocol = tcp
+chain = <known/chain>
+
+banaction = iptables-multiport
+banaction_allports = iptables-allports
+
+[sshd]
+port    = ssh
+backend = %(sshd_backend)s
+enabled = true

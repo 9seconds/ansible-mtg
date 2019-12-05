@@ -1,0 +1,57 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- name: enable ufw
+  ufw:
+    state: enabled
+
+- name: ensure default incoming rule for ufw is set
+  ufw:
+    default: "{{ item.value }}"
+    direction: "{{ item.key }}"
+  with_dict:
+    incoming: deny
+    outgoing: allow
+
+- name: enable services
+  ufw:
+    rule: allow
+    name: "{{ item }}"
+  with_items:
+    - OpenSSH
+    - mosh
+
+- name: "ensure proxy port {{ proxy_port }} is open"
+  ufw:
+    rule: allow
+    port: "{{ proxy_port | string }}"
+    proto: tcp
+
+- name: set ufw ipv4 rules
+  blockinfile:
+    path: /etc/ufw/before.rules
+    block: "{{ lookup('template', 'ufw.rules.j2') }}"
+    backup: yes
+    insertbefore: "^COMMIT"
+  notify: restart ufw
+
+- name: set ufw ipv6 rules
+  blockinfile:
+    path: /etc/ufw/before6.rules
+    block: "{{ lookup('template', 'ufw6.rules.j2') }}"
+    backup: yes
+    insertbefore: "^COMMIT"
+  notify: restart ufw
+
+- name: Add the ip_conntrack module
+  modprobe:
+    name: ip_conntrack
+    state: present
+
+- name: Set kernel settings
+  sysctl:
+    name: "{{ item.key }}"
+    value: "{{ item.value }}"
+    state: present
+  with_dict: "{{ sysctl }}"

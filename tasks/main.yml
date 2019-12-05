@@ -1,0 +1,17 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- include: ./base.yml
+  when: exclusive
+
+- include: ./ntp.yml
+  when: exclusive
+
+- include: ./fail2ban.yml
+  when: exclusive
+
+- include: ./hardening.yml
+  when: exclusive
+
+- include: ./mtg.yml

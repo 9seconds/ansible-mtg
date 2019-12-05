@@ -1,0 +1,14 @@
+{{ ansible_managed | comment }}
+[Unit]
+Description=mtg - a telegram proxy
+
+[Service]
+ExecStart={{ proxy_binary }} run {{ proxy_cli_opts }} -b {{ proxy_bind | quote }} {{ proxy_secret | quote }} {{ proxy_adtag }}
+Restart=on-failure
+Type=simple
+RestartSec=3
+ProtectHome=true
+DynamicUser=true
+
+[Install]
+WantedBy=multi-user.target

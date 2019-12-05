@@ -1,0 +1,37 @@
+---
+# vim: set ft=yaml.ansible:
+
+
+- name: remove ntp
+  apt:
+    name:
+      - ntp
+      - ntpdate
+    state: absent
+    purge: yes
+    autoremove: yes
+  notify: apt changed
+
+- name: set timezone
+  become: true
+  command: timedatectl set-timezone {{ timezone | quote }}
+  notify: restart timesyncd
+
+- name: set ntp
+  become: true
+  command: timedatectl set-ntp true
+  notify: restart timesyncd
+
+- name: ensure timesyncd.d directory created
+  file:
+    path: /etc/systemd/timesyncd.conf.d
+    state: directory
+
+- name: set timesyncd config
+  template:
+    src: timesyncd.conf.j2
+    dest: /etc/systemd/timesyncd.conf.d/zzz-own-config.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart timesyncd
